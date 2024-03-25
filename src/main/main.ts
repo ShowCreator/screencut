@@ -12,9 +12,8 @@ import path from 'path';
 import { app, BrowserWindow, shell, ipcMain } from 'electron';
 import { autoUpdater } from 'electron-updater';
 import log from 'electron-log';
-import MenuBuilder from './menu';
-import TrayBuilder from './tray';
 import { resolveHtmlPath } from './util';
+import { ShortCutKey, MenuBuilder, TrayBuilder } from './module';
 
 class AppUpdater {
   constructor() {
@@ -104,6 +103,10 @@ const createWindow = async () => {
 
   const trayBuild = new TrayBuilder({ icon: getAssetPath('camera.png') });
   trayBuild.buildTray();
+
+  const keyBuilder = new ShortCutKey(mainWindow);
+  keyBuilder.buildKeys();
+
   // Open urls in the user's browser
   mainWindow.webContents.setWindowOpenHandler((edata) => {
     shell.openExternal(edata.url);
