@@ -9,11 +9,12 @@
  * `./src/main.js` using webpack. This gives us some performance wins.
  */
 import path from 'path';
-import { app, BrowserWindow, shell, ipcMain } from 'electron';
+import { app, BrowserWindow, shell, ipcMain, desktopCapturer } from 'electron';
 import { autoUpdater } from 'electron-updater';
 import log from 'electron-log';
 import { resolveHtmlPath } from './util';
 import { ShortCutKey, MenuBuilder, TrayBuilder } from './module';
+import genCutWindow, { getSize } from './utils/GenCutWindow';
 
 class AppUpdater {
   constructor() {
@@ -25,10 +26,22 @@ class AppUpdater {
 
 let mainWindow: BrowserWindow | null = null;
 
-ipcMain.on('ipc-example', async (event, arg) => {
-  const msgTemplate = (pingPong: string) => `IPC test: ${pingPong}`;
-  console.log(msgTemplate(arg));
-  event.reply('ipc-example', msgTemplate('pong'));
+ipcMain.on('SHOW_CUT_SCREEN', async (e) => {
+  const sources = await desktopCapturer.getSources({
+    types: ['screen'],
+    thumbnailSize: getSize(),
+  });
+  console.log('sources: //////////////', sources);
+
+  // eslint-disable-next-line no-unused-expressions
+  genCutWindow.cutWindow &&
+    genCutWindow.cutWindow.webContents.send(
+      'GET_SCREEN_IMAGE',
+      sources[0],
+    );
+
+  console.log('----------');
+
 });
 
 if (process.env.NODE_ENV === 'production') {
@@ -138,6 +151,7 @@ app
       // On macOS it's common to re-create a window in the app when the
       // dock icon is clicked and there are no other windows open.
       if (mainWindow === null) createWindow();
+
     });
   })
   .catch(console.log);

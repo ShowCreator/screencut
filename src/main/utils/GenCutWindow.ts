@@ -1,7 +1,7 @@
 import { BrowserWindow, app, screen } from 'electron';
 import path from 'path';
 
-function getSize() {
+export function getSize() {
   const { size, scaleFactor } = screen.getPrimaryDisplay();
   return {
     width: size.width * scaleFactor,
@@ -13,32 +13,40 @@ function GenCutWindow() {
 }
 GenCutWindow.prototype.createCutWindow = function () {
   const { width, height } = getSize();
+  console.log('app.isPackaged: ', app.isPackaged);
+  console.log('__dirname: ', __dirname);
+  console.log(
+    'path.join(__dirname ',
+    path.join(__dirname, '../../../.erb/dll/preload.js'),
+  );
+
   this.cutWindow = new BrowserWindow({
-    width,
-    height,
-    autoHideMenuBar: true,
-    useContentSize: true,
-    movable: false,
-    frame: false,
-    resizable: false,
-    hasShadow: false,
-    transparent: true,
-    fullscreenable: true,
-    fullscreen: true,
-    simpleFullscreen: true,
-    alwaysOnTop: false,
+    width: 800,
+    height: 400,
+    // autoHideMenuBar: true,
+    // useContentSize: true,
+    // movable: false,
+    // frame: false,
+    // resizable: false,
+    // hasShadow: false,
+    // transparent: true,
+    // fullscreenable: true,
+    // fullscreen: true,
+    // simpleFullscreen: true,
+    // alwaysOnTop: false,
     webPreferences: {
       preload: app.isPackaged
         ? path.join(__dirname, 'preload.js')
         : path.join(__dirname, '../../../.erb/dll/preload.js'),
       nodeIntegration: true,
-      contextIsolation: false,
+      enableRemoteModule: true,
+      // contextIsolation: false,
     },
   });
-  const url = 'http://localhost:1212/';
+  const url = 'http://localhost:1212/cut';
   this.cutWindow.loadURL(url);
-  this.cutWindow.maximize();
-  this.cutWindow.setFullScreen(true);
+  // this.cutWindow.maximize();
+  // this.cutWindow.setFullScreen(true);
 };
 
 GenCutWindow.prototype.closeCutWindow = function () {

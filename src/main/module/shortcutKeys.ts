@@ -1,5 +1,5 @@
-import { BrowserWindow } from 'electron';
-import genCutWindow from '../utils/GenCutWindow';
+import { BrowserWindow, desktopCapturer, ipcMain } from 'electron';
+import genCutWindow, { getSize } from '../utils/GenCutWindow';
 
 const { globalShortcut } = require('electron');
 
@@ -15,7 +15,8 @@ class ShortCutKey {
       genCutWindow.closeCutWindow();
       this.mainWindow.hide();
       genCutWindow.createCutWindow();
-      genCutWindow.cutWindow.show();
+
+      // genCutWindow.cutWindow.show();
     });
 
     globalShortcut.register('Esc', () => {
@@ -23,6 +24,7 @@ class ShortCutKey {
       this.mainWindow.show();
     });
   }
+
 }
 
 export default ShortCutKey;
